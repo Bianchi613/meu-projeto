@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Alunos</title>
+</head>
+<body>
+    <h1>Gerenciamento de Alunos</h1>
+
+    <!-- Formulário para Adicionar Aluno -->
+    <h2>Adicionar Aluno</h2>
+    <form id="addAlunoForm">
+        Nome: <input type="text" id="nome" required><br>
+        Idade: <input type="number" id="idade" required><br>
+        <button type="submit">Adicionar Aluno</button>
+    </form>
+
+    <!-- Listar todos os alunos -->
+    <h2>Lista de Alunos</h2>
+    <button onclick="listarAlunos()">Listar Alunos</button>
+    <div id="alunosList"></div>
+
+    <!-- Buscar Aluno por ID -->
+    <h2>Buscar Aluno por ID</h2>
+    <input type="number" id="alunoIdBusca" placeholder="ID do Aluno">
+    <button onclick="buscarAluno()">Buscar Aluno</button>
+    <div id="alunoInfo"></div>
+
+    <!-- Atualizar Aluno -->
+    <h2>Atualizar Aluno</h2>
+    <form id="updateAlunoForm">
+        ID do Aluno: <input type="number" id="updateId" required><br>
+        Nome: <input type="text" id="updateNome"><br>
+        Idade: <input type="number" id="updateIdade"><br>
+        <button type="submit">Atualizar Aluno</button>
+    </form>
+
+    <!-- Excluir Aluno -->
+    <h2>Excluir Aluno</h2>
+    <input type="number" id="deleteId" placeholder="ID do Aluno">
+    <button onclick="deletarAluno()">Excluir Aluno</button>
+
+    <script>
+        const apiUrl = 'http://localhost:3000/alunos';
+
+        // Adicionar aluno
+        document.getElementById('addAlunoForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const nome = document.getElementById('nome').value;
+            const idade = parseInt(document.getElementById('idade').value);
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome, idade })
+            });
+
+            listarAlunos();
+        });
+
+        // Listar alunos
+        async function listarAlunos() {
+            const response = await fetch(apiUrl);
+            const alunos = await response.json();
+            document.getElementById('alunosList').innerHTML = alunos.map(aluno => 
+                `<p>ID: ${aluno.id} | Nome: ${aluno.nome} | Idade: ${aluno.idade}</p>`).join('');
+        }
+
+        // Buscar aluno por ID
+        async function buscarAluno() {
+            const id = document.getElementById('alunoIdBusca').value;
+            const response = await fetch(`${apiUrl}/${id}`);
+            if (response.ok) {
+                const aluno = await response.json();
+                document.getElementById('alunoInfo').innerText = `ID: ${aluno.id} | Nome: ${aluno.nome} | Idade: ${aluno.idade}`;
+            } else {
+                document.getElementById('alunoInfo').innerText = 'Aluno não encontrado';
+            }
+        }
+
+        // Atualizar aluno
+        document.getElementById('updateAlunoForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const id = parseInt(document.getElementById('updateId').value);
+            const nome = document.getElementById('updateNome').value;
+            const idade = parseInt(document.getElementById('updateIdade').value);
+
+            await fetch(`${apiUrl}/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome, idade })
+            });
+
+            listarAlunos();
+        });
+
+        // Deletar aluno
+        async function deletarAluno() {
+            const id = document.getElementById('deleteId').value;
+            await fetch(`${apiUrl}/${id}`, { method: 'DELETE' });
+            listarAlunos();
+        }
+    </script>
+</body>
+</html>
