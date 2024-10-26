@@ -1,0 +1,15 @@
+{
+  "name": "meu-projeto",
+  "version": "1.0.0",
+  "description": "Trabalho node",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Alan Bianchi",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.1",
+    "meu-projeto": "file:"
+  }
+}
